@@ -1,17 +1,13 @@
-FROM python:3.9-alpine
-
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+FROM continuumio/miniconda3
 
 WORKDIR /app
 
-COPY Pipfile /app/
-COPY Pipfile.lock /app/
-RUN pip3 install --upgrade pip
-RUN pip3 install pipenv
-RUN pipenv install --system --deploy
-RUN pipenv install --system
+# Create the environment:
+COPY environment.yml .
+RUN conda env create -f environment.yml
+
+# Activate the environment, and make sure it's activated:
+SHELL ["conda", "run", "-n", "myenv", "/bin/bash", "-c"]
 
 COPY . /app/
-
 CMD ["python", "app.py"]
