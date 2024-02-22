@@ -1,10 +1,9 @@
-name: myenv
+name: mechat
 channels:
   - conda-forge
 dependencies:
   - python=3.9
   - flask
   - openai
-  - python-dotenv
   - transformers
   - pytorch
