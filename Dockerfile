@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.5.0-cudnn8-devel-ubuntu20.04
+FROM python:3.12-alpine
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
