@@ -10,4 +10,4 @@ RUN conda env create -f environment.yml
 SHELL ["conda", "run", "-n", "myenv", "/bin/bash", "-c"]
 
 COPY . /app/
-CMD ["python", "app.py"]
+CMD ["conda", "run", "-n", "myenv", "python", "app.py"]
