@@ -51,4 +51,5 @@ def get_diablo_response(prompt):
         return tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
 
 if __name__ == '__main__':
-    app.run()
+    port = 5050
+    app.run('0.0.0.0', port)
