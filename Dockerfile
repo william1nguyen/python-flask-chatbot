@@ -7,15 +7,15 @@ ENV DEBCONF_NONINTERACTIVE_SEEN true
 
 RUN --mount=type=cache,target=/root/.cache \
     apt-get update -y \
+    && apt-get install -y python3 \
     && apt-get install -y python3-pip \
     && pip3 install --upgrade pip
 
-COPY . /mechat/
-
 RUN --mount=type=cache,target=/root/.cache \
-    pip3 install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
+    pip3 install torch==1.9.0+cpu torchvision==0.10.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
 
 COPY ./requirements.txt /mechat/
+COPY . /mechat
 
 # Install requirements
 RUN --mount=type=cache,target=/root/.cache \
