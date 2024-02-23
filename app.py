@@ -1,4 +1,5 @@
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch
 from flask import Flask, render_template, request
 import openai
 import os
@@ -34,16 +35,20 @@ def get_openai_response(prompt):
 
 tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
 model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
-generator = pipeline('text-generation', model=model, tokenizer=tokenizer)
 
 def get_diablo_response(prompt):
-    # Generate a response using the pipeline
-    response = generator(prompt, max_length=1000, num_return_sequences=1)[0]['generated_text']
+    for step in range(5):
+        # encode the new user input, add the eos_token and return a tensor in Pytorch
+        new_user_input_ids = tokenizer.encode(str(prompt) + tokenizer.eos_token, return_tensors='pt')
 
-    # Remove special tokens from the response
-    response = tokenizer.decode(tokenizer.encode(response, add_special_tokens=False), skip_special_tokens=True)
+        # append the new user input tokens to the chat history
+        bot_input_ids = torch.cat([chat_history_ids, new_user_input_ids], dim=-1) if step > 0 else new_user_input_ids
 
-    return response
+        # generated a response while limiting the total chat history to 1000 tokens, 
+        chat_history_ids = model.generate(bot_input_ids, max_length=1000, pad_token_id=tokenizer.eos_token_id)
+
+        # pretty print last ouput tokens from bot
+        return tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
 
 if __name__ == '__main__':
     port = 5050
