@@ -1,20 +1,27 @@
-FROM continuumio/miniconda:latest
+FROM nvidia/cuda:12.2.0-devel-ubuntu22.04
 
-WORKDIR /home/docker_conda_template
+WORKDIR /mechat
 
-COPY environment.yml ./
-COPY static/ ./
-COPY templates ./
-COPY app.py ./
-COPY boot.sh ./
+ENV DEBIAN_FRONTEND noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN true
 
-RUN chmod +x boot.sh
+RUN --mount=type=cache,target=/root/.cache \
+    apt-get update -y \
+    && apt-get install -y python3-pip \
+    && pip3 install --upgrade pip
 
-RUN conda env create -f environment.yml
+COPY . /mechat/
 
-RUN echo "source activate mechat" &gt; ~/.bashrc
-ENV PATH /opt/conda/envs/mechat/bin:$PATH
+RUN --mount=type=cache,target=/root/.cache \
+    pip3 install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
+
+COPY ./requirements.txt /mechat/
+
+# Install requirements
+RUN --mount=type=cache,target=/root/.cache \
+    pip3 install -r requirements.txt 
 
 EXPOSE 5050
 
-ENTRYPOINT ["./boot.sh"]
+# Run app
+CMD [ "python3 app.py" ]
