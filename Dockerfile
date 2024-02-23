@@ -12,7 +12,7 @@ RUN --mount=type=cache,target=/root/.cache \
     && pip3 install --upgrade pip
 
 RUN --mount=type=cache,target=/root/.cache \
-    pip3 install torch
+    pip3 install torch==1.1.2
 
 COPY ./requirements.txt /mechat/
 COPY . /mechat
