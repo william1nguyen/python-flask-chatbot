@@ -16,6 +16,11 @@ RUN --mount=type=cache,target=/root/.cache \
 
 COPY ./requirements.txt /mechat/
 COPY . /mechat
+RUN chmod +x app.py
+RUN chmod +x boot.sh
+
+RUN ls
+RUN python3 --version
 
 # Install requirements
 RUN --mount=type=cache,target=/root/.cache \
@@ -24,4 +29,4 @@ RUN --mount=type=cache,target=/root/.cache \
 EXPOSE 5050
 
 # Run app
-CMD [ "python3 app.py" ]
+ENTRYPOINT [ "./boot.sh" ]
